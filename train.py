@@ -19,7 +19,7 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms, models
 
 # importing custom functions
-from functions import load_data, build_classifier
+from functions import load_data, build_classifier, validation, train_model, test_model, save_model, load_checkpoint
 # employing parser for getting inputs 
 parser = argparse.ArgumentParser(description='Train your neural enter or change parameters using argparse commands')
 
@@ -83,27 +83,18 @@ build_classifier(model, input_units, hidden_units,dropout)
 # criterion.. NLLoss selected since we provided logsoftmax for classifier
 criterion = nn.NLLLoss()
 
+# optimizer 
+optimizer  = optim.Adam(model.classifier.parameters(), learning_rate)
 
+# train model
+model, optimizer = train_model(model, epochs,trainloader, validloader, criterion, optimizer, gpu_mode)
 
+# Test model
+test_model(model, testloader, gpu_mode)
 
+# Save model
+save_model(model, train_data, optimizer, save_dir, epochs)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+end = time()
+total = end-start
+print('!!! Training completed !!! \n \n Total Time Taken: {}:{}:{}'.format( int(total/3600), int((total%3600)/60),int((total%3600)%60) ))
