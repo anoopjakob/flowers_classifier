@@ -1,4 +1,5 @@
 import torch
+import pandas as pd
 import numpy as np
 from PIL import Image
 from torch import nn
@@ -41,8 +42,90 @@ def build_classifier(model, input_units, hidden_units, dropout):
     # replacing the original classifier with the new one
     model.classifier = classifier
     return model
+def validation(model, validloader, criterion, gpu_mode):
+    valid_loss = 0
+    accuracy = 0
+
+    # checking for gpu mode
+    if gpu_mode == True:
+        model.to('cuda')
+    else:
+        pass
+    # data from valid loader used for validation
+    for ii ,(images, labels) in enumerate(validloader):
+        if gpu_mode == True:
+        # change model to work with cuda
+            if torch.cuda.is_available():
+                images, labels = images.to('cuda'), labels.to('cuda')
+        else:
+            pass
+        #forward pass
+        output = model.forward(images)
+
+        #calculating loss
+        valid_loss += criterion(output, labels).item()
+        # calcualting probability
+        ps = torch.exp(output) #because output is in log form
+        #calculate accuracy
+        equality = (labels.data == ps.max(dim=1)[1])
+        accuracy+= equality.type(torch.FloatTensor).mean()
+    return valid_loss, accuracy 
 
 
+def train_model(model , epochs, trainloader, validloader, criterion, optimizer, gpu_mode):
+    # epochs =3
+    iterations = 0
+    print_every = 10
+    if gpu_mode == True:
+        model.to('cuda')
+    else:
+        pass
+    for e in range(epochs):
+        running_loss = 0
+        # getting values for iteration from trainloader
+        for ii, (inputs, labels) in enumerate(trainloader):
+            iterations+=1
+
+            if gpu_mode == True:
+                inputs, labels == inputs.to('cuda'), labels.to('cuda')
+            else:
+                pass
+            
+            # parameter gradinets set to zero ..
+            optimizer.zero_grad()
+
+            # forward pass
+            outputs = model.forward(inputs)
+
+            # calcuating the model loss.. variation from the actual value
+            loss = criterion(outputs,labels)
+
+            # backward pass
+            loss.backward()
+            
+            #updating the weights
+            optimizer.step()
+
+            # adding all losses to calculate the training loss
+            running_loss+= loss
+
+            # validation area
+            if iterations % print_every == 0:
+                # evaluation mode.. 
+                model.eval()
+            #here backpropogation or gradient upadation not required
+                with torch.no_grad():
+                    # using validaation function..
+                    valid_loss, accuracy = validation(model, validloader, criterion, gpu_mode)
+                print(f"No. epochs: {e+1}, \
+                    Training Loss: {round(running_loss/print_every,3)} \
+                    Valid Loss: {round(valid_loss/len(validloader),3)} \
+                    Valid accuracy: {round(float(accuracy/len(validloader)),3)}")
+                running_loss = 0
+                
+                #Resuming training
+                model.train()
+    return model, optimizer
 
 
 
