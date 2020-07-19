@@ -5,6 +5,7 @@ from torch import nn
 from torch import optim
 import torch.nn.functional as F
 from torchvision import datasets, models, transforms
+from collections import OrderedDict
 
 def load_data(data_dir):
     train_transforms = transforms.Compose([transforms.RandomRotation(30),transforms.RandomSizedCrop(224),
@@ -25,7 +26,21 @@ def load_data(data_dir):
 
     return trainloader, testloader, validloader, train_data, test_data, valid_data
 
-
+def build_classifier(model, input_units, hidden_units, dropout):
+    # freezing the weights of the pretrained model
+    for param in model.parameters():
+        param.requires_grad = False
+    # building new classifier section only
+    classifier = nn.Sequential(OrderedDict([
+        ('fc1', nn.Linear(input_units, hidden_units)),
+        ('relu', nn.ReLU()),
+        ('dropout1', nn.Dropout(dropout)),
+        ('fc2', nn.Linear(hidden_units,102)),
+        ('output', nn.LogSoftmax(dim=1))
+    ]))
+    # replacing the original classifier with the new one
+    model.classifier = classifier
+    return model
 
 
 

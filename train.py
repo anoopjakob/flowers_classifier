@@ -19,7 +19,7 @@ import torch.nn.functional as F
 from torchvision import datasets, transforms, models
 
 # importing custom functions
-from functions import load_data
+from functions import load_data, build_classifier
 # employing parser for getting inputs 
 parser = argparse.ArgumentParser(description='Train your neural enter or change parameters using argparse commands')
 
@@ -71,6 +71,20 @@ start = time()
 
 # working on data .. loading processing.. converting it into tensor etc..
 trainloader, testloader, validloader, train_data, test_data, valid_data = load_data(data_dir)
+
+# loading a pretrained model
+pre_tr_model = results.pretrained_model
+model = getattr(models, pre_tr_model)(pretrained = True)
+
+# building a new classifier and replacing it with old classifier
+input_units = model.classifier[0].in_features
+build_classifier(model, input_units, hidden_units,dropout)
+
+# criterion.. NLLoss selected since we provided logsoftmax for classifier
+criterion = nn.NLLLoss()
+
+
+
 
 
 
