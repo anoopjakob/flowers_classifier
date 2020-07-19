@@ -137,7 +137,7 @@ def validation(model, validloader, criterion, gpu_mode):
 def train_model(model, epochs,trainloader, validloader, criterion, optimizer, gpu_mode):
     #epochs = 4
     iterations = 0
-    print_every = 15
+    print_every = 4
 
     if gpu_mode == True:
     # change to cuda
@@ -152,7 +152,7 @@ def train_model(model, epochs,trainloader, validloader, criterion, optimizer, gp
         # training step getting values for iteration from train loader
         for ii, (inputs, labels) in enumerate(trainloader):
             iterations += 1
-            
+            print('Iteration no:',ii+1)
             if gpu_mode == True:
                 inputs, labels = inputs.to('cuda'), labels.to('cuda')
             else:
