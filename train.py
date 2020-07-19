@@ -88,9 +88,10 @@ optimizer  = optim.Adam(model.classifier.parameters(), learning_rate)
 # train model
 model, optimizer = train_model(model, epochs,trainloader, validloader, criterion, optimizer, gpu_mode)
 
+print('testing...')
 # Test model
 test_model(model, testloader, gpu_mode)
-
+print('saving..')
 # Save model
 save_model(model, train_data, optimizer, save_dir, epochs)
 

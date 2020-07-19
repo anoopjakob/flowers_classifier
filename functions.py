@@ -278,8 +278,8 @@ def predict(processed_image, loaded_model, topk, gpu_mode):
     index_top = probs.topk(topk)[1]
     
     # Converting it into np array or lists
-    probs_top_list = np.array(probs_top)[0]
-    index_top_list = np.array(index_top[0])
+    probs_top_list = np.array(probs_top)[0].cpu()
+    index_top_list = np.array(index_top[0]).cpu()
     
     # Loading index and class mapping
     class_to_idx = loaded_model.class_to_idx
