@@ -82,7 +82,6 @@ build_classifier(model, input_units, hidden_units,dropout)
 
 # criterion.. NLLoss selected since we provided logsoftmax for classifier
 criterion = nn.NLLLoss()
-
 # optimizer 
 optimizer  = optim.Adam(model.classifier.parameters(), learning_rate)
 
