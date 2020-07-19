@@ -9,7 +9,7 @@ from torchvision import datasets, models, transforms
 from collections import OrderedDict
 
 def load_data(data_dir):
-    train_transforms = transforms.Compose([transforms.RandomRotation(30),transforms.RandomSizedCrop(224),
+    train_transforms = transforms.Compose([transforms.RandomRotation(30),transforms.RandomResizedCrop(224),
                                            transforms.RandomHorizontalFlip(), transforms.ToTensor, 
                                            transforms.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225])])
     # both validation and testing using the same set
@@ -17,8 +17,8 @@ def load_data(data_dir):
                                           transforms.ToTensor(),
                                           transforms.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225])])
     train_data = datasets.ImageFolder(data_dir + '/train', transform = train_transforms)
-    test_data = datasets.ImageFolder(datasets + '/test', transform = test_transforms)
-    valid_data = datasets.ImageFolder(datasets + '/valid', transform= test_transforms)
+    test_data = datasets.ImageFolder(data_dir + '/test', transform = test_transforms)
+    valid_data = datasets.ImageFolder(data_dir + '/valid', transform= test_transforms)
 
     # loading to trainloader and testloader.. only for trainloader shuffle is true
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=64, shuffle=True)
